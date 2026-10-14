@@ -2,6 +2,8 @@ from pathlib import Path
 import csv
 import pandas as pd
 
+CANONICAL_COLUMNS = ["open", "high", "low", "close", "volume"]
+
 def _read_one(path: Path) -> pd.DataFrame:
     sample = path.read_text(encoding="utf-8", errors="ignore")[:4096]
     dialect = csv.Sniffer().sniff(sample, delimiters=",;\t")
@@ -34,3 +36,13 @@ def load_csvs(raw_dir: str | Path, pattern: str = "*.csv") -> pd.DataFrame:
     df = df.sort_values("time").drop_duplicates("time", keep="last").set_index("time")
     df.index.name = "time"
     return df[["open", "high", "low", "close", "volume"]].astype(float)
+
+def detect_timeframe(bars: pd.DataFrame) -> str:
+    """Return a conservative timeframe label from the median positive spacing."""
+    if len(bars) < 2:
+        return "unknown"
+    minutes = bars.index.to_series().diff().dropna().dt.total_seconds().div(60)
+    value = float(minutes[minutes > 0].median())
+    mapping = {1: "M1", 5: "M5", 15: "M15", 30: "M30", 60: "H1", 240: "H4", 1440: "D1", 10080: "W1"}
+    nearest = min(mapping, key=lambda x: abs(x - value))
+    return mapping[nearest] if abs(nearest - value) <= max(1, nearest * .1) else f"{value:.2f}min"

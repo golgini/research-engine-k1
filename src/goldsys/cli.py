@@ -4,10 +4,10 @@ import pandas as pd
 import typer
 from goldsys import __version__
 from goldsys.config import load_config
-from goldsys.data.loader import load_csvs
-from goldsys.data.cleaner import clean_bars
+from goldsys.data.loader import load_csvs, detect_timeframe
+from goldsys.data.cleaner import clean_bars, flag_gaps
 from goldsys.data.resampler import resample_bars
-from goldsys.data.quality import quality_report, save_quality
+from goldsys.data.quality import quality_report, save_quality, save_quality_markdown
 from goldsys.features.base import build_features
 from goldsys.strategies.registry import list_strategies
 app=typer.Typer(help="XAUUSD research and strategy system")
@@ -17,10 +17,10 @@ holdout_app=typer.Typer(); app.add_typer(holdout_app,name="holdout")
 def version(): typer.echo(__version__)
 @data_app.command("ingest")
 def ingest(config: str="config/config.yaml", timeframe: str="M1"):
-    cfg=load_config(config); bars=clean_bars(load_csvs(cfg["data"]["raw_dir"],cfg["data"]["file_glob"]),bad_tick_multiple=cfg["data"]["bad_tick_atr_multiple"]); out=resample_bars(bars,timeframe); Path("data/interim").mkdir(parents=True,exist_ok=True); out.to_parquet(f"data/interim/bars_{timeframe}.parquet"); typer.echo(f"wrote {len(out):,} canonical {timeframe} bars")
+    cfg=load_config(config); bars=flag_gaps(clean_bars(load_csvs(cfg["data"]["raw_dir"],cfg["data"]["file_glob"]),bad_tick_multiple=cfg["data"]["bad_tick_atr_multiple"]),cfg["data"]["max_gap_minutes_intraday"]); detected=detect_timeframe(bars); target=detected if timeframe.lower()=="auto" else timeframe; out=resample_bars(bars,target); Path("data/interim").mkdir(parents=True,exist_ok=True); out.to_parquet(f"data/interim/bars_{target}.parquet"); typer.echo(f"detected {detected}; wrote {len(out):,} canonical {target} bars")
 @data_app.command("quality")
 def quality(config: str="config/config.yaml", timeframe: str="M1"):
-    cfg=load_config(config); p=Path(f"data/interim/bars_{timeframe}.parquet"); bars=pd.read_parquet(p) if p.exists() else resample_bars(clean_bars(load_csvs(cfg["data"]["raw_dir"])),timeframe); r=quality_report(bars); save_quality(r,"reports/quality.json"); typer.echo(json.dumps(r,indent=2))
+    cfg=load_config(config); p=Path(f"data/interim/bars_{timeframe}.parquet"); bars=pd.read_parquet(p) if p.exists() else resample_bars(flag_gaps(clean_bars(load_csvs(cfg["data"]["raw_dir"])),cfg["data"]["max_gap_minutes_intraday"]),timeframe); r=quality_report(bars); save_quality(r,"reports/quality.json"); save_quality_markdown(r,"reports/quality.md"); typer.echo(json.dumps(r,indent=2))
 @app.command("strategies")
 def strategies(): typer.echo("\n".join(list_strategies()))
 @app.command("features")

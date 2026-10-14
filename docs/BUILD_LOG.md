@@ -3,3 +3,6 @@
 ## 2026-10-14 — S0–S3 foundation
 
 Created the installable Python package, YAML configuration, canonical CSV loader for the supplied headerless Dukascopy format, cleaning and resampling pipeline, JSON quality report, split manager with a hold-out lock, registered look-ahead-safe core features, strategy signal interface, session-breakout baseline, conservative next-open backtester, and initial performance metrics. Raw source files remain untouched. Known limits: the complete S4–S14 profiling, validation, ML and execution layers remain to be implemented.
+## 2026-10-14 — S1 data ingestion and quality
+
+Extended the loader with timeframe detection and canonical schema handling, added OHLC correction flags, intraday gap flags, suspect-bar retention, JSON and Markdown quality reports, and CLI support for automatic timeframe detection. The S1 test suite passes on synthetic data in four tests. The raw 2009–2025 files remain unchanged and excluded from version control; full-dataset materialization is still an operational step to run next.
