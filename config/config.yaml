@@ -1,0 +1,46 @@
+project:
+  seed: 42
+  symbol: XAUUSD
+data:
+  raw_dir: data
+  file_glob: "*.csv"
+  datetime_column: auto
+  timezone_source: UTC
+  timezone_market: UTC
+  base_timeframe: auto
+  analysis_timeframes: [M15, H1, H4, D1]
+  price_decimals: 2
+  max_gap_minutes_intraday: 60
+  bad_tick_atr_multiple: 15
+splits:
+  train: ["2009-01-01", "2019-12-31"]
+  validation: ["2020-01-01", "2022-12-31"]
+  holdout: ["2023-01-01", "2025-12-31"]
+  holdout_locked: true
+sessions_utc:
+  asia: ["00:00", "07:00"]
+  london: ["07:00", "12:00"]
+  ny: ["12:00", "21:00"]
+costs:
+  spread_points: 0.30
+  slippage_points: 0.10
+  commission_per_lot: 0.0
+  swap_long_per_lot_per_day: 0.0
+  swap_short_per_lot_per_day: 0.0
+  point_value_per_lot: 100
+engine:
+  initial_equity: 10000
+  intrabar_conflict: sl_first
+  allow_multiple_positions: false
+  max_bars_in_trade: null
+risk:
+  risk_per_trade_pct: 0.5
+  min_lot: 0.01
+  lot_step: 0.01
+  max_lot: 5.0
+validation:
+  monte_carlo_runs: 200
+  gate:
+    min_trades: 20
+    min_profit_factor: 1.25
+    max_drawdown_pct: 25

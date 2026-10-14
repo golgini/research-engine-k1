@@ -1,6 +1,6 @@
-data/*.csv
 data/interim/
 data/processed/
+data/*.csv
 reports/
 config/.holdout_unlocked
 **/__pycache__/
