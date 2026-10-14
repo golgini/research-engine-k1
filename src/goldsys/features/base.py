@@ -21,4 +21,5 @@ def core_features(bars: pd.DataFrame, cfg: dict) -> pd.DataFrame:
 
 def build_features(bars: pd.DataFrame, cfg: dict | None = None) -> pd.DataFrame:
     cfg = cfg or {}; parts = [fn(bars, cfg) for fn in REGISTRY.values()]
-    return pd.concat(parts, axis=1).loc[:, ~pd.concat(parts, axis=1).columns.duplicated()]
+    merged = pd.concat(parts, axis=1)
+    return merged.loc[:, ~merged.columns.duplicated()]

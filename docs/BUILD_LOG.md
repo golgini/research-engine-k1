@@ -10,3 +10,7 @@ Extended the loader with timeframe detection and canonical schema handling, adde
 ## 2026-10-14 — S2 split manager and hold-out lock
 
 Added centralized `load_bars`, explicit period validation, train/validation/dev slicing, configurable unlock-flag handling, and timestamped hold-out audit logging with user and reason. The hold-out remains locked unless explicitly unlocked. The full suite passes six tests.
+
+## 2026-10-14 — S3 feature engine
+
+Added registered volatility, session, level, trend, calendar, and structure feature families. Features use rolling/past-only calculations, and confirmed swings are delayed until confirmation bars. Added a prefix-versus-full-series look-ahead regression test. The full suite passes eight tests.
