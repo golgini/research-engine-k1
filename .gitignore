@@ -1,0 +1,9 @@
+data/*.csv
+data/interim/
+data/processed/
+reports/
+config/.holdout_unlocked
+**/__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
