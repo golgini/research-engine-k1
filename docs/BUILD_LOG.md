@@ -6,3 +6,7 @@ Created the installable Python package, YAML configuration, canonical CSV loader
 ## 2026-10-14 — S1 data ingestion and quality
 
 Extended the loader with timeframe detection and canonical schema handling, added OHLC correction flags, intraday gap flags, suspect-bar retention, JSON and Markdown quality reports, and CLI support for automatic timeframe detection. The S1 test suite passes on synthetic data in four tests. The raw 2009–2025 files remain unchanged and excluded from version control; full-dataset materialization is still an operational step to run next.
+
+## 2026-10-14 — S2 split manager and hold-out lock
+
+Added centralized `load_bars`, explicit period validation, train/validation/dev slicing, configurable unlock-flag handling, and timestamped hold-out audit logging with user and reason. The hold-out remains locked unless explicitly unlocked. The full suite passes six tests.

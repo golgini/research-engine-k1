@@ -8,6 +8,7 @@ from goldsys.data.loader import load_csvs, detect_timeframe
 from goldsys.data.cleaner import clean_bars, flag_gaps
 from goldsys.data.resampler import resample_bars
 from goldsys.data.quality import quality_report, save_quality, save_quality_markdown
+from goldsys.data.splits import unlock_holdout
 from goldsys.features.base import build_features
 from goldsys.strategies.registry import list_strategies
 app=typer.Typer(help="XAUUSD research and strategy system")
@@ -27,9 +28,9 @@ def strategies(): typer.echo("\n".join(list_strategies()))
 def features(timeframe: str="H1", config: str="config/config.yaml"):
     cfg=load_config(config); bars=pd.read_parquet(f"data/interim/bars_{timeframe}.parquet"); f=build_features(bars,cfg); Path("data/processed").mkdir(parents=True,exist_ok=True); f.to_parquet(f"data/processed/features_{timeframe}.parquet"); typer.echo(f"wrote {f.shape[1]} features")
 @holdout_app.command("unlock")
-def holdout_unlock(confirm: bool=False):
+def holdout_unlock(confirm: bool=False, reason: str="manual research authorization"):
     if not confirm: raise typer.BadParameter("Pass --confirm to unlock the hold-out")
-    Path("config/.holdout_unlocked").write_text("unlocked\n",encoding="utf-8"); Path("reports").mkdir(exist_ok=True); Path("reports/holdout_access.log").open("a",encoding="utf-8").write("holdout unlocked\n"); typer.echo("hold-out unlocked and access logged")
+    unlock_holdout(load_config(), reason=reason); typer.echo("hold-out unlocked and access logged")
 
 if __name__ == "__main__":
     app()
