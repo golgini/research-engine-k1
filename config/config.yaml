@@ -21,6 +21,14 @@ sessions_utc:
   asia: ["00:00", "07:00"]
   london: ["07:00", "12:00"]
   ny: ["12:00", "21:00"]
+regimes:
+  atr_window: 14
+  percentile_window: 100
+  adx_threshold: 20.0
+  slope_window: 5
+  slope_threshold_atr: 0.02
+  low_vol_percentile: 0.33
+  high_vol_percentile: 0.67
 costs:
   spread_points: 0.30
   slippage_points: 0.10
