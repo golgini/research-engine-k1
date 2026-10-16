@@ -46,9 +46,22 @@ risk:
   min_lot: 0.01
   lot_step: 0.01
   max_lot: 5.0
+  daily_loss_cap_pct: 2.0
+  max_drawdown_pct: 25.0
+  max_open_positions: 1
+  losing_streak_limit: 0
 validation:
   monte_carlo_runs: 200
   gate:
     min_trades: 20
     min_profit_factor: 1.25
     max_drawdown_pct: 25
+ml:
+  max_depth: 2
+  n_splits: 5
+  embargo: 1
+  min_auc: 0.55
+  max_instability: 0.15
+execution:
+  mode: paper
+  telegram_enabled: false

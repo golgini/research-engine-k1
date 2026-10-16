@@ -1,0 +1,4 @@
+name: mean_reversion
+params:
+  extension_atr: 1.5
+  stop_atr: 1.0

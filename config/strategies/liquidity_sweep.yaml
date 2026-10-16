@@ -1,0 +1,4 @@
+name: liquidity_sweep
+params:
+  rr: 1.5
+  buffer_atr: 0.15

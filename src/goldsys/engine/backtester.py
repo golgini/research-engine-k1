@@ -5,6 +5,7 @@ import pandas as pd
 from goldsys.strategies.base import Signal
 from .broker_sim import close_position, pending_fill, protective_exit
 from .portfolio import equity_curve, mark_to_market
+from goldsys.risk.engine import RiskEngine
 
 
 @dataclass
@@ -32,6 +33,7 @@ def run_backtest(bars, signals: list[Signal], cfg, strategy_name="strategy", par
     pending, active = [], []
     rows, balances, unrealized = [], [], []
     balance = initial
+    risk_engine = RiskEngine(cfg) if "risk" in cfg else None
 
     for i, (timestamp, bar) in enumerate(bars.iterrows()):
         if timestamp in by_time:
@@ -47,8 +49,12 @@ def run_backtest(bars, signals: list[Signal], cfg, strategy_name="strategy", par
                 if signal.expiry_bars is not None and i - signal_i > signal.expiry_bars:
                     pending.remove((signal, signal_i))
                 continue
+            lots = risk_engine.size_position(balance, abs(fill.price - signal.stop_loss)) if risk_engine else 1.0
+            if lots <= 0:
+                pending.remove((signal, signal_i))
+                continue
             active.append({"signal": signal, "entry_time": fill.time, "entry": fill.price,
-                           "entry_i": i, "lots": 1.0, "risk": abs(fill.price - signal.stop_loss),
+                           "entry_i": i, "lots": lots, "risk": abs(fill.price - signal.stop_loss),
                            "mae": 0.0, "mfe": 0.0})
             pending.remove((signal, signal_i))
             if not allow_multiple:
@@ -84,6 +90,8 @@ def run_backtest(bars, signals: list[Signal], cfg, strategy_name="strategy", par
                 "bars_held": i - position["entry_i"], "meta": signal.meta,
             })
             balance += net
+            if risk_engine:
+                risk_engine.record(timestamp, net, balance)
             active.remove(position)
 
         balances.append(balance)

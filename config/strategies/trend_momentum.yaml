@@ -1,0 +1,5 @@
+name: trend_momentum
+params:
+  rr: 2.0
+  adx_threshold: 20.0
+  sl_atr: 1.5
